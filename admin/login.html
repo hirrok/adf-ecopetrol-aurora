@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ecopetrol Admin — Login</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#0b0f1a;color:#e2e8f0;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .card{background:#111827;border:1px solid rgba(255,255,255,0.07);padding:48px 40px;width:100%;max-width:400px;border-radius:8px;}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:36px;}
+    .brand-mark{width:36px;height:36px;background:#f77f00;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.75rem;color:#fff;letter-spacing:-0.05em;}
+    .brand-name{font-size:0.9rem;font-weight:700;line-height:1.2;}
+    .brand-sub{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.15em;}
+    h1{font-size:1.3rem;font-weight:700;margin-bottom:8px;}
+    .sub{font-size:0.8rem;color:#64748b;margin-bottom:32px;}
+    label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:6px;}
+    input[type=password]{width:100%;background:#0b0f1a;border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;padding:12px 14px;font-size:0.9rem;border-radius:4px;outline:none;margin-bottom:24px;transition:border-color 0.2s;}
+    input[type=password]:focus{border-color:#f77f00;}
+    button{width:100%;background:#f77f00;color:#fff;border:none;padding:13px;font-size:0.875rem;font-weight:700;border-radius:4px;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s;}
+    button:hover{background:#e06e00;}
+    .error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:10px 14px;border-radius:4px;font-size:0.8rem;margin-bottom:20px;display:none;}
+    .footer{margin-top:32px;font-size:0.7rem;color:#334155;text-align:center;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <div class="brand-mark">EC</div>
+      <div>
+        <div class="brand-name">Ecopetrol Aurora</div>
+        <div class="brand-sub">Operations Portal</div>
+      </div>
+    </div>
+    <h1>Employee Login</h1>
+    <p class="sub">Authorized personnel only. Access is logged.</p>
+    <div class="error" id="err">Incorrect password. Try again.</div>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" placeholder="Enter your password" autocomplete="current-password"/>
+    <button onclick="login()">Sign In →</button>
+    <div class="footer">Aurora Digital Foundry · Admin Infrastructure</div>
+  </div>
+
+  <script>
+    // Demo password: ecopetrol2026
+    // Replace HASH with: await crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourpassword'))
+    const HASH = 'a7b9c3d2e1f04856789abcdef012345678901234567890abcdef01234567890ab'; // placeholder — see setup instructions
+
+    // For demo: simple plaintext check (swap for hash check before launch)
+    const DEMO_PASSWORD = 'ecopetrol2026';
+
+    function login() {
+      const pw = document.getElementById('pw').value;
+      if (pw === DEMO_PASSWORD) {
+        const session = { loggedIn: true, expires: Date.now() + 8 * 60 * 60 * 1000, user: 'Employee' };
+        localStorage.setItem('eco_admin_session', JSON.stringify(session));
+        window.location.href = 'dashboard.html';
+      } else {
+        document.getElementById('err').style.display = 'block';
+      }
+    }
+
+    document.getElementById('pw').addEventListener('keydown', e => {
+      if (e.key === 'Enter') login();
+    });
+
+    // Auto-redirect if already logged in
+    const s = JSON.parse(localStorage.getItem('eco_admin_session') || '{}');
+    if (s.loggedIn && s.expires > Date.now()) {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</body>
+</html>

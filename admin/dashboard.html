@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ecopetrol Admin — Dashboard</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0b0f1a;--surface:#111827;--surface2:#1e2535;
+      --border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#64748b;
+      --orange:#f77f00;--blue:#0077b6;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+    }
+    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    /* NAV */
+    nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .nav-brand{display:flex;align-items:center;gap:10px;}
+    .nav-mark{width:30px;height:30px;background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.7rem;color:#fff;}
+    .nav-title{font-size:0.9rem;font-weight:700;}
+    .nav-sub{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+    .nav-right{display:flex;align-items:center;gap:20px;}
+    .nav-user{font-size:0.8rem;color:var(--muted);}
+    .btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.75rem;transition:all 0.2s;}
+    .btn-logout:hover{border-color:var(--red);color:var(--red);}
+    /* LAYOUT */
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px);}
+    /* SIDEBAR */
+    aside{background:var(--surface);border-right:1px solid var(--border);padding:24px 0;}
+    .sidebar-section{padding:0 16px;margin-bottom:8px;}
+    .sidebar-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);padding:0 12px;margin-bottom:6px;}
+    .sidebar-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:transparent;border:none;color:var(--muted);cursor:pointer;border-radius:4px;font-size:0.82rem;text-align:left;transition:all 0.15s;}
+    .sidebar-btn:hover,.sidebar-btn.active{background:rgba(247,127,0,0.1);color:var(--text);}
+    .sidebar-btn.active{color:var(--orange);}
+    .sidebar-icon{font-size:1rem;width:20px;text-align:center;}
+    /* MAIN */
+    main{padding:28px;overflow-y:auto;}
+    .page{display:none;}
+    .page.active{display:block;}
+    .page-title{font-size:1.2rem;font-weight:700;margin-bottom:4px;}
+    .page-sub{font-size:0.8rem;color:var(--muted);margin-bottom:24px;}
+    /* STAT CARDS */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    .stat{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:6px;}
+    .stat-num{font-size:2rem;font-weight:800;letter-spacing:-0.03em;line-height:1;}
+    .stat-label{font-size:0.75rem;color:var(--muted);margin-top:6px;}
+    /* TABLE */
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:24px;}
+    .table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .table-title{font-size:0.9rem;font-weight:700;}
+    .badge{display:inline-block;font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:0.08em;}
+    .badge-new{background:rgba(247,127,0,0.15);color:var(--orange);}
+    .badge-open{background:rgba(16,185,129,0.15);color:var(--green);}
+    .badge-closed{background:rgba(100,116,139,0.15);color:var(--muted);}
+    .badge-limited{background:rgba(245,158,11,0.15);color:var(--yellow);}
+    table{width:100%;border-collapse:collapse;}
+    th{padding:10px 20px;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);border-bottom:1px solid var(--border);}
+    td{padding:12px 20px;font-size:0.82rem;border-bottom:1px solid var(--border);}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(255,255,255,0.02);}
+    .td-muted{color:var(--muted);}
+    /* PRICE EDITOR */
+    .price-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px;}
+    .price-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px;}
+    .price-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px;}
+    .price-input-wrap{display:flex;align-items:center;gap:8px;}
+    .price-prefix{font-size:0.9rem;color:var(--muted);}
+    .price-input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:4px;font-size:1.1rem;font-weight:700;width:100%;outline:none;transition:border-color 0.2s;}
+    .price-input:focus{border-color:var(--orange);}
+    .price-current{font-size:0.72rem;color:var(--muted);margin-top:6px;}
+    /* BRANCH GRID */
+    .branch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+    .branch-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px;}
+    .branch-name{font-size:0.85rem;font-weight:700;margin-bottom:12px;}
+    .branch-controls{display:flex;gap:8px;flex-wrap:wrap;}
+    .btn-status{padding:6px 14px;border-radius:4px;font-size:0.72rem;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all 0.15s;text-transform:uppercase;letter-spacing:0.05em;}
+    .btn-open{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);}
+    .btn-open:hover,.btn-open.active{background:var(--green);color:#fff;border-color:var(--green);}
+    .btn-limited{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--yellow);}
+    .btn-limited:hover,.btn-limited.active{background:var(--yellow);color:#fff;border-color:var(--yellow);}
+    .btn-closed{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red);}
+    .btn-closed:hover,.btn-closed.active{background:var(--red);color:#fff;border-color:var(--red);}
+    /* FORM */
+    .form-section{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:24px;margin-bottom:20px;}
+    .form-title{font-size:0.9rem;font-weight:700;margin-bottom:20px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .form-group{display:flex;flex-direction:column;gap:6px;}
+    .form-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+    .form-input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:4px;font-size:0.875rem;outline:none;transition:border-color 0.2s;}
+    .form-input:focus{border-color:var(--orange);}
+    .btn-primary{background:var(--orange);color:#fff;border:none;padding:12px 24px;border-radius:4px;font-size:0.875rem;font-weight:700;cursor:pointer;transition:background 0.2s;}
+    .btn-primary:hover{background:#e06e00;}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:12px 20px;border-radius:6px;font-size:0.85rem;font-weight:600;display:none;z-index:999;}
+    /* LOADING */
+    .loading{color:var(--muted);font-size:0.85rem;padding:20px;}
+    .refresh-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.75rem;}
+    .refresh-btn:hover{border-color:var(--orange);color:var(--orange);}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-mark">EC</div>
+    <div>
+      <div class="nav-title">Ecopetrol Aurora</div>
+      <div class="nav-sub">Operations Portal</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-user" id="navUser">Employee</span>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Overview</div>
+      <button class="sidebar-btn active" onclick="showPage('overview')">
+        <span class="sidebar-icon">📊</span> Dashboard
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Inquiries</div>
+      <button class="sidebar-btn" onclick="showPage('fleet')">
+        <span class="sidebar-icon">🚛</span> Fleet Applications
+      </button>
+      <button class="sidebar-btn" onclick="showPage('lpg')">
+        <span class="sidebar-icon">🔥</span> LPG Requests
+      </button>
+      <button class="sidebar-btn" onclick="showPage('contact')">
+        <span class="sidebar-icon">✉️</span> Messages
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Operations</div>
+      <button class="sidebar-btn" onclick="showPage('prices')">
+        <span class="sidebar-icon">⛽</span> Price Board
+      </button>
+      <button class="sidebar-btn" onclick="showPage('branches')">
+        <span class="sidebar-icon">📍</span> Branch Status
+      </button>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="page-title">Good morning, Operations.</div>
+      <div class="page-sub" id="overviewDate">Loading...</div>
+      <div class="stats" id="statsGrid">
+        <div class="stat"><div class="stat-num" id="s-fleet">—</div><div class="stat-label">Fleet Applications</div></div>
+        <div class="stat"><div class="stat-num" id="s-lpg">—</div><div class="stat-label">LPG Requests</div></div>
+        <div class="stat"><div class="stat-num" id="s-contact">—</div><div class="stat-label">Messages</div></div>
+        <div class="stat"><div class="stat-num" id="s-price" style="font-size:1.2rem">—</div><div class="stat-label">Current RON 91</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Recent Activity</div>
+          <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Type</th><th>Name / Company</th><th>Branch</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody id="recentTable"><tr><td colspan="5" class="loading">Loading data…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FLEET -->
+    <div class="page" id="page-fleet">
+      <div class="page-title">Fleet Account Applications</div>
+      <div class="page-sub">Companies applying for fleet fuel accounts</div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">All Applications</div>
+          <button class="refresh-btn" onclick="loadFleet()">↻ Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Company</th><th>Contact</th><th>Phone</th><th>Fleet Size</th><th>Products</th><th>Branch</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="fleetTable"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LPG -->
+    <div class="page" id="page-lpg">
+      <div class="page-title">LPG Delivery Requests</div>
+      <div class="page-sub">Residential and commercial LPG delivery inquiries</div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">All Requests</div>
+          <button class="refresh-btn" onclick="loadLPG()">↻ Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Size</th><th>Qty</th><th>Branch</th><th>Delivery Date</th><th>Type</th></tr></thead>
+          <tbody id="lpgTable"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="page" id="page-contact">
+      <div class="page-title">Messages & Inquiries</div>
+      <div class="page-sub">General contact form submissions</div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">All Messages</div>
+          <button class="refresh-btn" onclick="loadContact()">↻ Refresh</button>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Phone</th><th>Subject</th><th>Message</th><th>Branch</th><th>Date</th></tr></thead>
+          <tbody id="contactTable"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRICES -->
+    <div class="page" id="page-prices">
+      <div class="page-title">Fuel Price Board</div>
+      <div class="page-sub">Update today's pump prices. Changes reflect on the live site immediately.</div>
+      <div class="price-grid" id="priceGrid">
+        <div class="price-card">
+          <div class="price-label">Unleaded RON 91</div>
+          <div class="price-input-wrap"><span class="price-prefix">₱</span><input class="price-input" id="p-ron91" type="number" step="0.01" placeholder="0.00"/></div>
+          <div class="price-current" id="cur-ron91">Current: loading…</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">Premium RON 95</div>
+          <div class="price-input-wrap"><span class="price-prefix">₱</span><input class="price-input" id="p-ron95" type="number" step="0.01" placeholder="0.00"/></div>
+          <div class="price-current" id="cur-ron95">Current: loading…</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">Diesel Euro 4</div>
+          <div class="price-input-wrap"><span class="price-prefix">₱</span><input class="price-input" id="p-diesel" type="number" step="0.01" placeholder="0.00"/></div>
+          <div class="price-current" id="cur-diesel">Current: loading…</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">Kerosene</div>
+          <div class="price-input-wrap"><span class="price-prefix">₱</span><input class="price-input" id="p-kerosene" type="number" step="0.01" placeholder="0.00"/></div>
+          <div class="price-current" id="cur-kerosene">Current: loading…</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="savePrices()">Publish Price Update →</button>
+    </div>
+
+    <!-- BRANCHES -->
+    <div class="page" id="page-branches">
+      <div class="page-title">Branch Status</div>
+      <div class="page-sub">Toggle real-time status per branch. Customers see this on the website.</div>
+      <div class="branch-grid" id="branchGrid">
+        <div class="loading">Loading branch data…</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">✓ Saved successfully</div>
+
+<script>
+  // ── CONFIG ────────────────────────────────────────────
+  // Replace with your deployed Apps Script URL after setup
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
+
+  const BRANCHES = [
+    'Maria Aurora — Flagship','Baler NE','Baler Pingit','Dipaculao South',
+    'San Luis','Dinadiawan','Detailen — Maria Aurora','Uno — Maria Aurora'
+  ];
+
+  // ── AUTH ──────────────────────────────────────────────
+  function checkAuth() {
+    const s = JSON.parse(localStorage.getItem('eco_admin_session') || '{}');
+    if (!s.loggedIn || s.expires < Date.now()) {
+      window.location.href = 'login.html';
+    }
+    document.getElementById('navUser').textContent = s.user || 'Employee';
+  }
+
+  function logout() {
+    localStorage.removeItem('eco_admin_session');
+    window.location.href = 'login.html';
+  }
+
+  checkAuth();
+
+  // ── NAVIGATION ────────────────────────────────────────
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    if (id === 'fleet') loadFleet();
+    if (id === 'lpg') loadLPG();
+    if (id === 'contact') loadContact();
+    if (id === 'prices') loadPrices();
+    if (id === 'branches') loadBranches();
+  }
+
+  // ── DATE ─────────────────────────────────────────────
+  const now = new Date();
+  document.getElementById('overviewDate').textContent =
+    now.toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // ── FETCH HELPERS ─────────────────────────────────────
+  async function fetchData(type) {
+    try {
+      const res = await fetch(`${SCRIPT_URL}?type=${type}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch {
+      // Demo mode: return sample data when script not configured
+      return getDemoData(type);
+    }
+  }
+
+  function getDemoData(type) {
+    const ts = new Date().toISOString();
+    if (type === 'fleet') return [
+      { Timestamp: ts, Company: 'Aurora Construction Corp.', ContactName: 'Ronaldo S.', Phone: '+63 917 xxx xxxx', FleetSize: '12 units', ProductMix: 'Diesel', Branch: 'Maria Aurora — Flagship', Status: 'New' },
+      { Timestamp: ts, Company: 'LGU Baler Motor Pool', ContactName: 'Ma. Santos', Phone: '+63 918 xxx xxxx', FleetSize: '8 units', ProductMix: 'Diesel + Unleaded', Branch: 'Baler NE', Status: 'New' },
+    ];
+    if (type === 'lpg') return [
+      { Timestamp: ts, Name: 'Maricel R.', Phone: '+63 916 xxx xxxx', Address: 'Brgy. Suklayin, Maria Aurora', CylinderSize: '11kg', Quantity: '2', Branch: 'Maria Aurora — Flagship', DeliveryDate: '2026-06-02', CustomerType: 'Residential', Status: 'New' },
+    ];
+    if (type === 'contact') return [
+      { Timestamp: ts, Name: 'Jose P.', Phone: '+63 915 xxx xxxx', Subject: 'Fleet Account Inquiry', Message: 'We have 5 vehicles and want to open an account.', Branch: 'Baler NE', Status: 'New' },
+    ];
+    if (type === 'prices') return [
+      { Timestamp: ts, RON91: '89.50', RON95: '94.00', Diesel: '84.50', Kerosene: '118.50', UpdatedBy: 'Admin' }
+    ];
+    if (type === 'branches') return BRANCHES.map(b => ({ BranchName: b, Status: 'Open', Note: '', UpdatedAt: ts }));
+    return [];
+  }
+
+  // ── LOAD ALL (overview) ───────────────────────────────
+  async function loadAll() {
+    const [fleet, lpg, contact, prices] = await Promise.all([
+      fetchData('fleet'), fetchData('lpg'), fetchData('contact'), fetchData('prices')
+    ]);
+    document.getElementById('s-fleet').textContent = fleet.length;
+    document.getElementById('s-lpg').textContent = lpg.length;
+    document.getElementById('s-contact').textContent = contact.length;
+    const latest = prices[0];
+    document.getElementById('s-price').textContent = latest ? `₱${latest.RON91}` : '—';
+
+    const recent = [
+      ...fleet.slice(0, 3).map(r => ({ type: 'Fleet', name: r.Company, branch: r.Branch, ts: r.Timestamp, status: r.Status })),
+      ...lpg.slice(0, 3).map(r => ({ type: 'LPG', name: r.Name, branch: r.Branch, ts: r.Timestamp, status: r.Status })),
+      ...contact.slice(0, 3).map(r => ({ type: 'Message', name: r.Name, branch: r.Branch, ts: r.Timestamp, status: r.Status })),
+    ].sort((a, b) => new Date(b.ts) - new Date(a.ts)).slice(0, 8);
+
+    const tbody = document.getElementById('recentTable');
+    tbody.innerHTML = recent.length ? recent.map(r => `
+      <tr>
+        <td>${r.type}</td>
+        <td>${r.name}</td>
+        <td class="td-muted">${r.branch}</td>
+        <td class="td-muted">${fmtDate(r.ts)}</td>
+        <td><span class="badge badge-new">${r.status}</span></td>
+      </tr>
+    `).join('') : '<tr><td colspan="5" class="loading">No activity yet.</td></tr>';
+  }
+
+  // ── FLEET ─────────────────────────────────────────────
+  async function loadFleet() {
+    const data = await fetchData('fleet');
+    document.getElementById('fleetTable').innerHTML = data.length ? data.map(r => `
+      <tr>
+        <td><strong>${r.Company}</strong></td>
+        <td>${r.ContactName}</td>
+        <td class="td-muted">${r.Phone}</td>
+        <td>${r.FleetSize}</td>
+        <td>${r.ProductMix}</td>
+        <td class="td-muted">${r.Branch}</td>
+        <td class="td-muted">${fmtDate(r.Timestamp)}</td>
+        <td><span class="badge badge-new">${r.Status}</span></td>
+      </tr>
+    `).join('') : '<tr><td colspan="8" class="loading">No applications yet.</td></tr>';
+  }
+
+  // ── LPG ──────────────────────────────────────────────
+  async function loadLPG() {
+    const data = await fetchData('lpg');
+    document.getElementById('lpgTable').innerHTML = data.length ? data.map(r => `
+      <tr>
+        <td><strong>${r.Name}</strong></td>
+        <td>${r.Phone}</td>
+        <td class="td-muted">${r.Address}</td>
+        <td>${r.CylinderSize}</td>
+        <td>${r.Quantity}</td>
+        <td class="td-muted">${r.Branch}</td>
+        <td>${r.DeliveryDate || '—'}</td>
+        <td>${r.CustomerType}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="8" class="loading">No requests yet.</td></tr>';
+  }
+
+  // ── CONTACT ───────────────────────────────────────────
+  async function loadContact() {
+    const data = await fetchData('contact');
+    document.getElementById('contactTable').innerHTML = data.length ? data.map(r => `
+      <tr>
+        <td><strong>${r.Name}</strong></td>
+        <td>${r.Phone}</td>
+        <td>${r.Subject || '—'}</td>
+        <td class="td-muted" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.Message}</td>
+        <td class="td-muted">${r.Branch || '—'}</td>
+        <td class="td-muted">${fmtDate(r.Timestamp)}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="6" class="loading">No messages yet.</td></tr>';
+  }
+
+  // ── PRICES ────────────────────────────────────────────
+  async function loadPrices() {
+    const data = await fetchData('prices');
+    const latest = data[0] || {};
+    ['ron91','ron95','diesel','kerosene'].forEach(k => {
+      const key = k === 'ron91' ? 'RON91' : k === 'ron95' ? 'RON95' : k === 'diesel' ? 'Diesel' : 'Kerosene';
+      document.getElementById('cur-' + k).textContent = `Current: ₱${latest[key] || '—'}`;
+      document.getElementById('p-' + k).placeholder = latest[key] || '0.00';
+    });
+  }
+
+  async function savePrices() {
+    const payload = {
+      type: 'updatePrice',
+      ron91: document.getElementById('p-ron91').value,
+      ron95: document.getElementById('p-ron95').value,
+      diesel: document.getElementById('p-diesel').value,
+      kerosene: document.getElementById('p-kerosene').value,
+      updatedBy: JSON.parse(localStorage.getItem('eco_admin_session') || '{}').user || 'Admin'
+    };
+    if (!payload.ron91 && !payload.ron95 && !payload.diesel && !payload.kerosene) {
+      alert('Enter at least one price to update.'); return;
+    }
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    } catch {}
+    showToast('Price board updated ✓');
+    loadPrices();
+  }
+
+  // ── BRANCHES ─────────────────────────────────────────
+  async function loadBranches() {
+    const data = await fetchData('branches');
+    const statusMap = {};
+    data.forEach(r => { statusMap[r.BranchName] = r.Status || 'Open'; });
+
+    document.getElementById('branchGrid').innerHTML = BRANCHES.map(b => {
+      const status = statusMap[b] || 'Open';
+      return `
+        <div class="branch-card">
+          <div class="branch-name">${b}</div>
+          <div class="branch-controls">
+            <button class="btn-status btn-open ${status==='Open'?'active':''}" onclick="setBranch('${b}','Open',this)">Open</button>
+            <button class="btn-status btn-limited ${status==='Limited'?'active':''}" onclick="setBranch('${b}','Limited',this)">Limited</button>
+            <button class="btn-status btn-closed ${status==='Closed'?'active':''}" onclick="setBranch('${b}','Closed',this)">Closed</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function setBranch(name, status, btn) {
+    const card = btn.closest('.branch-card');
+    card.querySelectorAll('.btn-status').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ type:'updateBranch', branchName:name, status }) });
+    } catch {}
+    showToast(`${name}: ${status}`);
+  }
+
+  // ── UTILS ─────────────────────────────────────────────
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    try { return new Date(ts).toLocaleString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
+    catch { return ts; }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = '✓ ' + msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  // ── INIT ─────────────────────────────────────────────
+  loadAll();
+</script>
+</body>
+</html>
