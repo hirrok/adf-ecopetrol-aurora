@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ecopetrol Admin — Dashboard</title>
+  <title>Ecopetrol Aurora — Operations Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Karla:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0b0f1a;--surface:#111827;--surface2:#1e2535;
-      --border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#64748b;
-      --yellow:#d4a800;--blue:#0077b6;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+      --bg:#0b0f1a;--surface:#111827;--surface2:#1a2235;
+      --border:rgba(255,255,255,0.08);--text:#e2e8f0;--muted:#64748b;
+      --yellow:#d4a800;--blue:#1a3fa0;--green:#16a34a;--red:#ef4444;
+      --ff:'Karla',sans-serif;--fh:'Syne',sans-serif;
     }
-    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh;}
     /* NAV */
     nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
     .nav-brand{display:flex;align-items:center;gap:10px;}
     .nav-mark{width:30px;height:30px;background:#1a3fa0;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.7rem;color:#fff;}
-    .nav-title{font-size:0.9rem;font-weight:700;}
-    .nav-sub{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+    .nav-title{font-size:0.9rem;font-weight:700;font-family:var(--fh);}
+    .nav-sub{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.15em;}
     .nav-right{display:flex;align-items:center;gap:20px;}
     .nav-user{font-size:0.8rem;color:var(--muted);}
     .btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.75rem;transition:all 0.2s;}
@@ -36,7 +39,7 @@
     main{padding:28px;overflow-y:auto;}
     .page{display:none;}
     .page.active{display:block;}
-    .page-title{font-size:1.2rem;font-weight:700;margin-bottom:4px;}
+    .page-title{font-size:1.3rem;font-weight:800;font-family:var(--fh);letter-spacing:-0.02em;margin-bottom:4px;}
     .page-sub{font-size:0.8rem;color:var(--muted);margin-bottom:24px;}
     /* STAT CARDS */
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
@@ -49,9 +52,25 @@
     .table-title{font-size:0.9rem;font-weight:700;}
     .badge{display:inline-block;font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:0.08em;}
     .badge-new{background:rgba(212,168,0,0.15);color:var(--yellow);}
-    .badge-open{background:rgba(16,185,129,0.15);color:var(--green);}
+    .badge-open{background:rgba(22,163,74,0.15);color:var(--green);}
     .badge-closed{background:rgba(100,116,139,0.15);color:var(--muted);}
-    .badge-limited{background:rgba(245,158,11,0.15);color:var(--yellow);}
+    .badge-limited{background:rgba(212,168,0,0.15);color:var(--yellow);}
+    .badge-inreview{background:rgba(26,63,160,0.2);color:#93b4ff;}
+    .badge-done{background:rgba(22,163,74,0.15);color:var(--green);}
+    .badge-declined{background:rgba(239,68,68,0.12);color:var(--red);}
+    /* STATUS SELECT */
+    .status-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:3px;font-size:0.72rem;cursor:pointer;outline:none;}
+    .status-sel:focus{border-color:var(--yellow);}
+    /* NOTIF DOT */
+    .notif{display:inline-block;width:7px;height:7px;background:var(--yellow);border-radius:50%;margin-left:6px;vertical-align:middle;}
+    /* PRICE HISTORY */
+    .price-history-wrap{margin-top:24px;}
+    .history-row{display:flex;gap:16px;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.78rem;}
+    .history-row:last-child{border-bottom:none;}
+    .history-who{color:var(--muted);font-size:0.72rem;}
+    /* BRANCH NOTE */
+    .branch-note-input{width:100%;margin-top:10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:3px;font-size:0.75rem;font-family:var(--ff);resize:none;outline:none;}
+    .branch-note-input:focus{border-color:var(--yellow);color:var(--text);}
     table{width:100%;border-collapse:collapse;}
     th{padding:10px 20px;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);border-bottom:1px solid var(--border);}
     td{padding:12px 20px;font-size:0.82rem;border-bottom:1px solid var(--border);}
@@ -123,13 +142,13 @@
     <div class="sidebar-section">
       <div class="sidebar-label">Inquiries</div>
       <button class="sidebar-btn" onclick="showPage('fleet')">
-        <span class="sidebar-icon">🚛</span> Fleet Applications
+        <span class="sidebar-icon">🚛</span> Fleet Applications<span class="notif" id="notif-fleet" style="display:none"></span>
       </button>
       <button class="sidebar-btn" onclick="showPage('lpg')">
-        <span class="sidebar-icon">🔥</span> LPG Requests
+        <span class="sidebar-icon">🔥</span> LPG Requests<span class="notif" id="notif-lpg" style="display:none"></span>
       </button>
       <button class="sidebar-btn" onclick="showPage('contact')">
-        <span class="sidebar-icon">✉️</span> Messages
+        <span class="sidebar-icon">✉️</span> Messages<span class="notif" id="notif-contact" style="display:none"></span>
       </button>
     </div>
     <div class="sidebar-section">
@@ -180,6 +199,7 @@
           <thead><tr><th>Company</th><th>Contact</th><th>Phone</th><th>Fleet Size</th><th>Products</th><th>Branch</th><th>Date</th><th>Status</th></tr></thead>
           <tbody id="fleetTable"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody>
         </table>
+        <div style="padding:10px 20px;font-size:0.72rem;color:var(--muted)">Change status inline. Updates sync to Google Sheets.</div>
       </div>
     </div>
 
@@ -242,6 +262,10 @@
         </div>
       </div>
       <button class="btn-primary" onclick="savePrices()">Publish Price Update →</button>
+      <div class="price-history-wrap">
+        <div style="font-size:0.82rem;font-weight:700;margin:24px 0 12px">Change Log</div>
+        <div id="priceLog" class="loading">Loading history…</div>
+      </div>
     </div>
 
     <!-- BRANCHES -->
@@ -341,6 +365,13 @@
     document.getElementById('s-fleet').textContent = fleet.length;
     document.getElementById('s-lpg').textContent = lpg.length;
     document.getElementById('s-contact').textContent = contact.length;
+    // Notif dots for new items
+    const newFleet = fleet.filter(r => !r.Status || r.Status === 'New').length;
+    const newLpg = lpg.filter(r => !r.Status || r.Status === 'New').length;
+    const newContact = contact.filter(r => !r.Status || r.Status === 'New').length;
+    document.getElementById('notif-fleet').style.display = newFleet ? 'inline-block' : 'none';
+    document.getElementById('notif-lpg').style.display = newLpg ? 'inline-block' : 'none';
+    document.getElementById('notif-contact').style.display = newContact ? 'inline-block' : 'none';
     const latest = prices[0];
     document.getElementById('s-price').textContent = latest ? `₱${latest.RON91}` : '—';
 
@@ -363,9 +394,25 @@
   }
 
   // ── FLEET ─────────────────────────────────────────────
+  const STATUS_OPTS = ['New','In Review','Contacted','Done','Declined'];
+  function statusBadgeClass(s) {
+    return {New:'badge-new','In Review':'badge-inreview',Contacted:'badge-inreview',Done:'badge-done',Declined:'badge-declined'}[s] || 'badge-new';
+  }
+  function statusSelect(type, id, current) {
+    const opts = STATUS_OPTS.map(o => `<option value="${o}" ${o===current?'selected':''}>${o}</option>`).join('');
+    return `<select class="status-sel" onchange="updateStatus('${type}','${id}',this.value)">${opts}</select>`;
+  }
+
+  async function updateStatus(type, rowId, status) {
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ type:'updateStatus', sheet:type, rowId, status }) });
+    } catch {}
+    showToast(`Status → ${status}`);
+  }
+
   async function loadFleet() {
     const data = await fetchData('fleet');
-    document.getElementById('fleetTable').innerHTML = data.length ? data.map(r => `
+    document.getElementById('fleetTable').innerHTML = data.length ? data.map((r,i) => `
       <tr>
         <td><strong>${r.Company}</strong></td>
         <td>${r.ContactName}</td>
@@ -374,7 +421,7 @@
         <td>${r.ProductMix}</td>
         <td class="td-muted">${r.Branch}</td>
         <td class="td-muted">${fmtDate(r.Timestamp)}</td>
-        <td><span class="badge badge-new">${r.Status}</span></td>
+        <td>${statusSelect('fleet', r.RowId||i, r.Status||'New')}</td>
       </tr>
     `).join('') : '<tr><td colspan="8" class="loading">No applications yet.</td></tr>';
   }
@@ -382,7 +429,7 @@
   // ── LPG ──────────────────────────────────────────────
   async function loadLPG() {
     const data = await fetchData('lpg');
-    document.getElementById('lpgTable').innerHTML = data.length ? data.map(r => `
+    document.getElementById('lpgTable').innerHTML = data.length ? data.map((r,i) => `
       <tr>
         <td><strong>${r.Name}</strong></td>
         <td>${r.Phone}</td>
@@ -391,7 +438,7 @@
         <td>${r.Quantity}</td>
         <td class="td-muted">${r.Branch}</td>
         <td>${r.DeliveryDate || '—'}</td>
-        <td>${r.CustomerType}</td>
+        <td>${statusSelect('lpg', r.RowId||i, r.Status||'New')}</td>
       </tr>
     `).join('') : '<tr><td colspan="8" class="loading">No requests yet.</td></tr>';
   }
@@ -420,6 +467,18 @@
       document.getElementById('cur-' + k).textContent = `Current: ₱${latest[key] || '—'}`;
       document.getElementById('p-' + k).placeholder = latest[key] || '0.00';
     });
+    // Price change log
+    const logEl = document.getElementById('priceLog');
+    if (data.length > 1) {
+      logEl.innerHTML = data.slice(0,8).map(r => `
+        <div class="history-row">
+          <span style="color:var(--text)">RON91 ₱${r.RON91} · RON95 ₱${r.RON95} · Diesel ₱${r.Diesel} · Kero ₱${r.Kerosene}</span>
+          <span class="history-who">${fmtDate(r.Timestamp)} · ${r.UpdatedBy || 'Admin'}</span>
+        </div>
+      `).join('');
+    } else {
+      logEl.innerHTML = '<div style="color:var(--muted);font-size:0.78rem">No previous updates yet.</div>';
+    }
   }
 
   async function savePrices() {
@@ -444,11 +503,14 @@
   // ── BRANCHES ─────────────────────────────────────────
   async function loadBranches() {
     const data = await fetchData('branches');
-    const statusMap = {};
-    data.forEach(r => { statusMap[r.BranchName] = r.Status || 'Open'; });
+    const branchMap = {};
+    data.forEach(r => { branchMap[r.BranchName] = r; });
 
     document.getElementById('branchGrid').innerHTML = BRANCHES.map(b => {
-      const status = statusMap[b] || 'Open';
+      const rec = branchMap[b] || {};
+      const status = rec.Status || 'Open';
+      const note = rec.Note || '';
+      const bId = b.replace(/[^a-z0-9]/gi,'_');
       return `
         <div class="branch-card">
           <div class="branch-name">${b}</div>
@@ -457,9 +519,17 @@
             <button class="btn-status btn-limited ${status==='Limited'?'active':''}" onclick="setBranch('${b}','Limited',this)">Limited</button>
             <button class="btn-status btn-closed ${status==='Closed'?'active':''}" onclick="setBranch('${b}','Closed',this)">Closed</button>
           </div>
+          <textarea class="branch-note-input" id="note-${bId}" placeholder="Reason for status (optional)…" rows="2" onblur="saveNote('${b}','${bId}')">${note}</textarea>
         </div>
       `;
     }).join('');
+  }
+
+  async function saveNote(branchName, bId) {
+    const note = document.getElementById('note-' + bId).value;
+    try {
+      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ type:'updateBranch', branchName, note }) });
+    } catch {}
   }
 
   async function setBranch(name, status, btn) {
