@@ -7,22 +7,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Karla:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0b0f1a;--surface:#111827;--border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#64748b;--orange:#f77f00;--green:#10b981;--ff:'Karla',sans-serif;--fh:'Syne',sans-serif;}
+    :root{--bg:#0b0f1a;--surface:#111827;--border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#64748b;--yellow:#d4a800;--green:#10b981;--ff:'Karla',sans-serif;--fh:'Syne',sans-serif;}
     body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.65;}
     a{color:inherit;text-decoration:none;}
     .container{max-width:1100px;margin:0 auto;padding:0 28px;}
     nav{background:rgba(11,15,26,0.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
     .nav-inner{height:66px;display:flex;align-items:center;justify-content:space-between;}
     .nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--fh);font-size:0.9rem;font-weight:800;}
-    .nav-mark{background:var(--orange);width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff;}
+    .nav-mark{background:#1a3fa0;width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff;}
     .nav-links{display:flex;gap:24px;list-style:none;}
     .nav-links a{font-size:0.82rem;color:var(--muted);transition:color 0.2s;}
     .nav-links a:hover{color:var(--text);}
     .btn{display:inline-flex;align-items:center;padding:10px 22px;border-radius:4px;font-size:0.82rem;font-weight:700;cursor:pointer;border:none;font-family:var(--ff);transition:all 0.2s;}
-    .btn-primary{background:var(--orange);color:#fff;}
+    .btn-primary{background:var(--yellow);color:#fff;}
     .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
     .page-hero{padding:60px 0 40px;}
-    .tag{display:inline-block;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--orange);border:1px solid rgba(247,127,0,0.3);padding:3px 12px;border-radius:2px;margin-bottom:16px;}
+    .tag{display:inline-block;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--yellow);border:1px solid rgba(212,168,0,0.3);padding:3px 12px;border-radius:2px;margin-bottom:16px;}
     h1{font-family:var(--fh);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;}
     .layout{display:grid;grid-template-columns:1fr 380px;gap:60px;padding:0 0 80px;}
     .form-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:36px;}
@@ -33,7 +33,7 @@
     .form-row .form-group{margin-bottom:0;}
     label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
     input,select,textarea{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:11px 14px;font-size:0.875rem;font-family:var(--ff);border-radius:4px;outline:none;transition:border-color 0.2s;width:100%;}
-    input:focus,select:focus,textarea:focus{border-color:var(--orange);}
+    input:focus,select:focus,textarea:focus{border-color:var(--yellow);}
     select option{background:#1a2235;}
     .form-success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:var(--green);padding:16px;border-radius:4px;font-size:0.875rem;display:none;margin-bottom:20px;}
     /* BRANCH CONTACTS */
@@ -41,7 +41,7 @@
     .bc-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:18px;}
     .bc-name{font-size:0.85rem;font-weight:700;margin-bottom:4px;}
     .bc-loc{font-size:0.75rem;color:var(--muted);margin-bottom:8px;}
-    .bc-phone{font-size:0.82rem;color:var(--orange);}
+    .bc-phone{font-size:0.82rem;color:var(--yellow);}
     .emergency-card{background:rgba(127,29,29,0.2);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:20px;margin-bottom:16px;}
     .em-title{font-size:0.9rem;font-weight:700;color:#fca5a5;margin-bottom:8px;}
     .em-text{font-size:0.8rem;color:#fca5a5;line-height:1.7;}
@@ -58,7 +58,7 @@
     <li><a href=prices.html>Prices</a></li>
     <li><a href=lpg.html>LPG</a></li>
     <li><a href=fleet.html>Fleet</a></li>
-    <li><a href=contact.html style="color:var(--orange)">Contact</a></li>
+    <li><a href=contact.html style="color:var(--yellow)">Contact</a></li>
   </ul>
   <a href=fleet.html class="btn btn-primary">Fleet Accounts</a>
 </div></div></nav>
@@ -134,14 +134,14 @@
       </div>
       <div class="branch-contacts">
         <p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:4px;">Branch Hotlines</p>
-        <div class="bc-card"><div class="bc-name">Maria Aurora — Flagship</div><div class="bc-loc">Brgy. 04, Poblacion, Maria Aurora</div><div class="bc-phone"><a href="tel:+639178214563" style="color:var(--orange)">+63 917 821 4563</a></div></div>
-        <div class="bc-card"><div class="bc-name">Baler NE</div><div class="bc-loc">Poblacion, Baler, Aurora 3200</div><div class="bc-phone"><a href="tel:+639185432901" style="color:var(--orange)">+63 918 543 2901</a></div></div>
-        <div class="bc-card"><div class="bc-name">Baler Pingit</div><div class="bc-loc">Brgy. Pingit, Baler, Aurora</div><div class="bc-phone"><a href="tel:+639067321845" style="color:var(--orange)">+63 906 732 1845</a></div></div>
-        <div class="bc-card"><div class="bc-name">Dipaculao South</div><div class="bc-loc">Poblacion, Dipaculao, Aurora</div><div class="bc-phone"><a href="tel:+639152346789" style="color:var(--orange)">+63 915 234 6789</a></div></div>
-        <div class="bc-card"><div class="bc-name">San Luis</div><div class="bc-loc">Poblacion, San Luis, Aurora</div><div class="bc-phone"><a href="tel:+639194567823" style="color:var(--orange)">+63 919 456 7823</a></div></div>
-        <div class="bc-card"><div class="bc-name">Dinadiawan</div><div class="bc-loc">Brgy. Dinadiawan, Baler, Aurora</div><div class="bc-phone"><a href="tel:+639056783412" style="color:var(--orange)">+63 905 678 3412</a></div></div>
-        <div class="bc-card"><div class="bc-name">Detailen — Maria Aurora</div><div class="bc-loc">Brgy. Detailen, Maria Aurora, Aurora</div><div class="bc-phone"><a href="tel:+639173456128" style="color:var(--orange)">+63 917 345 6128</a></div></div>
-        <div class="bc-card"><div class="bc-name">Uno — Maria Aurora</div><div class="bc-loc">Brgy. Uno, Maria Aurora, Aurora</div><div class="bc-phone"><a href="tel:+639182345679" style="color:var(--orange)">+63 918 234 5679</a></div></div>
+        <div class="bc-card"><div class="bc-name">Maria Aurora — Flagship</div><div class="bc-loc">Brgy. 04, Poblacion, Maria Aurora</div><div class="bc-phone"><a href="tel:+639178214563" style="color:var(--yellow)">+63 917 821 4563</a></div></div>
+        <div class="bc-card"><div class="bc-name">Baler NE</div><div class="bc-loc">Poblacion, Baler, Aurora 3200</div><div class="bc-phone"><a href="tel:+639185432901" style="color:var(--yellow)">+63 918 543 2901</a></div></div>
+        <div class="bc-card"><div class="bc-name">Baler Pingit</div><div class="bc-loc">Brgy. Pingit, Baler, Aurora</div><div class="bc-phone"><a href="tel:+639067321845" style="color:var(--yellow)">+63 906 732 1845</a></div></div>
+        <div class="bc-card"><div class="bc-name">Dipaculao South</div><div class="bc-loc">Poblacion, Dipaculao, Aurora</div><div class="bc-phone"><a href="tel:+639152346789" style="color:var(--yellow)">+63 915 234 6789</a></div></div>
+        <div class="bc-card"><div class="bc-name">San Luis</div><div class="bc-loc">Poblacion, San Luis, Aurora</div><div class="bc-phone"><a href="tel:+639194567823" style="color:var(--yellow)">+63 919 456 7823</a></div></div>
+        <div class="bc-card"><div class="bc-name">Dinadiawan</div><div class="bc-loc">Brgy. Dinadiawan, Baler, Aurora</div><div class="bc-phone"><a href="tel:+639056783412" style="color:var(--yellow)">+63 905 678 3412</a></div></div>
+        <div class="bc-card"><div class="bc-name">Detailen — Maria Aurora</div><div class="bc-loc">Brgy. Detailen, Maria Aurora, Aurora</div><div class="bc-phone"><a href="tel:+639173456128" style="color:var(--yellow)">+63 917 345 6128</a></div></div>
+        <div class="bc-card"><div class="bc-name">Uno — Maria Aurora</div><div class="bc-loc">Brgy. Uno, Maria Aurora, Aurora</div><div class="bc-phone"><a href="tel:+639182345679" style="color:var(--yellow)">+63 918 234 5679</a></div></div>
       </div>
     </div>
   </div>
