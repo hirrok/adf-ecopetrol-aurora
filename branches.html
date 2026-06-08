@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Karla:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#ffffff;--surface:#f4f6f9;--border:rgba(15,23,42,0.1);--text:#0f172a;--muted:#64748b;--yellow:#d4a800;--green:#16a34a;--yellow:#f59e0b;--red:#ef4444;--ff:'Karla',sans-serif;--fh:'Syne',sans-serif;}
+    :root{--bg:#ffffff;--surface:#f4f6f9;--border:rgba(15,23,42,0.1);--text:#0f172a;--muted:#64748b;--yellow:#d4a800;--green:#16a34a;--red:#ef4444;--ff:'Karla',sans-serif;--fh:'Syne',sans-serif;}
     body{font-family:var(--ff);background:var(--bg);color:var(--text);line-height:1.65;}
     a{color:inherit;text-decoration:none;}
     .container{max-width:1200px;margin:0 auto;padding:0 28px;}
@@ -37,6 +37,8 @@
     .branch-name{font-family:var(--fh);font-size:1rem;font-weight:700;}
     .status-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:3px 10px;border-radius:2px;white-space:nowrap;flex-shrink:0;}
     .status-open{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+    .status-limited{background:rgba(212,168,0,0.1);color:var(--yellow);border:1px solid rgba(212,168,0,0.25);}
+    .status-closed{background:rgba(100,116,139,0.1);color:#94a3b8;border:1px solid rgba(100,116,139,0.2);}
     .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
     .branch-address{font-size:0.8rem;color:var(--muted);margin-bottom:4px;}
     .branch-hours{font-size:0.78rem;color:var(--muted);margin-bottom:14px;}
@@ -159,33 +161,63 @@
     },
   ];
 
-  document.getElementById('branchGrid').innerHTML = BRANCHES.map(b => `
-    <div class="branch">
-      <div class="branch-map">
-        <iframe
-          src="${osmEmbed(b.lat, b.lon)}"
-          allowfullscreen
-          loading="lazy"
-          title="Map of ${b.name}">
-        </iframe>
-      </div>
-      <div class="branch-body">
-        <div class="branch-header">
-          <div class="branch-name">${b.name}</div>
-          <div class="status-badge status-open"><span class="status-dot"></span>Open</div>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
+
+  function statusClass(s) {
+    if (!s || s === 'Open')    return 'status-open';
+    if (s === 'Limited')       return 'status-limited';
+    if (s === 'Closed')        return 'status-closed';
+    return 'status-open';
+  }
+
+  function renderBranches(statusMap) {
+    document.getElementById('branchGrid').innerHTML = BRANCHES.map(b => {
+      const live   = statusMap[b.name] || {};
+      const status = live.Status || 'Open';
+      const cls    = statusClass(status);
+      return `
+        <div class="branch">
+          <div class="branch-map">
+            <iframe
+              src="${osmEmbed(b.lat, b.lon)}"
+              allowfullscreen
+              loading="lazy"
+              title="Map of ${b.name}">
+            </iframe>
+          </div>
+          <div class="branch-body">
+            <div class="branch-header">
+              <div class="branch-name">${b.name}</div>
+              <div class="status-badge ${cls}"><span class="status-dot"></span>${status}</div>
+            </div>
+            <div class="branch-address">📍 ${b.address}</div>
+            <div class="branch-hours">🕐 ${b.hours}</div>
+            <div class="branch-products">
+              ${b.products.map(p => `<span class="prod-tag ${p.includes('LPG')?'lpg':''}">${p}</span>`).join('')}
+            </div>
+            <div class="branch-actions">
+              <a href="${osmLink(b.lat, b.lon, b.name)}" target="_blank" class="btn btn-ghost btn-sm">Get Directions ↗</a>
+              <a href="tel:${b.phone.replace(/\s/g,'')}" class="btn btn-primary btn-sm">${b.phone}</a>
+            </div>
+          </div>
         </div>
-        <div class="branch-address">📍 ${b.address}</div>
-        <div class="branch-hours">🕐 ${b.hours}</div>
-        <div class="branch-products">
-          ${b.products.map(p => `<span class="prod-tag ${p.includes('LPG')?'lpg':''}">${p}</span>`).join('')}
-        </div>
-        <div class="branch-actions">
-          <a href="${osmLink(b.lat, b.lon, b.name)}" target="_blank" class="btn btn-ghost btn-sm">Get Directions ↗</a>
-          <a href="tel:${b.phone.replace(/\s/g,'')}" class="btn btn-primary btn-sm">${b.phone}</a>
-        </div>
-      </div>
-    </div>
-  `).join('');
+      `;
+    }).join('');
+  }
+
+  // Render with defaults immediately, then update with live data
+  renderBranches({});
+  (async () => {
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?type=branches`);
+      const json = await res.json();
+      const map  = {};
+      (json.data || []).forEach(r => { map[r.BranchName] = r; });
+      renderBranches(map);
+    } catch {
+      // Fetch failed — static defaults remain displayed
+    }
+  })();
 </script>
 </body>
 </html>

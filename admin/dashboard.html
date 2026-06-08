@@ -280,6 +280,26 @@
   </main>
 </div>
 
+<!-- MANAGER CONFIRM MODAL -->
+<div id="mgr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:32px;width:100%;max-width:440px;margin:0 24px;">
+    <div style="font-family:var(--fh);font-size:1.1rem;font-weight:800;margin-bottom:6px;letter-spacing:-0.02em" id="modal-title">Publish Price Update</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:24px">Manager authorization required. This will update the live public price board.</div>
+    <div style="margin-bottom:16px">
+      <div class="form-label" style="margin-bottom:6px">Reason for change <span style="color:var(--red)">*</span></div>
+      <textarea id="modal-reason" class="form-input" rows="2" placeholder="e.g. DOE weekly adjustment, supplier update, promo price…" style="width:100%;resize:none;font-family:var(--ff);"></textarea>
+    </div>
+    <div style="margin-bottom:28px">
+      <div class="form-label" style="margin-bottom:6px">Manager Code <span style="color:var(--red)">*</span></div>
+      <input type="password" id="modal-code" class="form-input" placeholder="Enter manager code" style="width:100%;" onkeydown="if(event.key==='Enter')confirmModal()"/>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end">
+      <button onclick="closeModal()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 20px;border-radius:4px;cursor:pointer;font-family:var(--ff);font-size:0.82rem;transition:border-color 0.2s;">Cancel</button>
+      <button onclick="confirmModal()" style="background:var(--yellow);color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:var(--ff);font-size:0.82rem;font-weight:700;">Confirm & Publish →</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Saved successfully</div>
 
 <script>
@@ -403,9 +423,11 @@
     return `<select class="status-sel" onchange="updateStatus('${type}','${id}',this.value)">${opts}</select>`;
   }
 
-  async function updateStatus(type, rowId, status) {
+  async function updateStatus(sheet, rowId, status) {
     try {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ type:'updateStatus', sheet:type, rowId, status }) });
+      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({
+        type: 'updateStatus', sheet, rowId, status, updatedBy: currentUser()
+      })});
     } catch {}
     showToast(`Status → ${status}`);
   }
@@ -481,22 +503,54 @@
     }
   }
 
-  async function savePrices() {
+  // ── MODAL ─────────────────────────────────────────────
+  let pendingAction = null;
+
+  function savePrices() {
+    const v = ['p-ron91','p-ron95','p-diesel','p-kerosene'].map(id => document.getElementById(id).value).filter(Boolean);
+    if (!v.length) { alert('Enter at least one price to update.'); return; }
+    pendingAction = 'prices';
+    document.getElementById('modal-reason').value = '';
+    document.getElementById('modal-code').value = '';
+    const modal = document.getElementById('mgr-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('modal-reason').focus(), 50);
+  }
+
+  function closeModal() {
+    document.getElementById('mgr-modal').style.display = 'none';
+    pendingAction = null;
+  }
+
+  async function confirmModal() {
+    const reason = document.getElementById('modal-reason').value.trim();
+    const code   = document.getElementById('modal-code').value.trim();
+    if (!reason) { document.getElementById('modal-reason').focus(); showToast('Reason required'); return; }
+    if (!code)   { document.getElementById('modal-code').focus(); showToast('Manager code required'); return; }
+    closeModal();
+    if (pendingAction === 'prices') await executePriceSave(reason, code);
+  }
+
+  async function executePriceSave(reason, managerCode) {
+    const user = JSON.parse(localStorage.getItem('eco_admin_session') || '{}').user || 'Manager';
     const payload = {
       type: 'updatePrice',
-      ron91: document.getElementById('p-ron91').value,
-      ron95: document.getElementById('p-ron95').value,
-      diesel: document.getElementById('p-diesel').value,
+      ron91:    document.getElementById('p-ron91').value,
+      ron95:    document.getElementById('p-ron95').value,
+      diesel:   document.getElementById('p-diesel').value,
       kerosene: document.getElementById('p-kerosene').value,
-      updatedBy: JSON.parse(localStorage.getItem('eco_admin_session') || '{}').user || 'Admin'
+      updatedBy: user,
+      reason: reason,
+      managerCode: managerCode
     };
-    if (!payload.ron91 && !payload.ron95 && !payload.diesel && !payload.kerosene) {
-      alert('Enter at least one price to update.'); return;
-    }
     try {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+      const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.error === 'UNAUTHORIZED') { showToast('Wrong manager code ✗'); return; }
     } catch {}
-    showToast('Price board updated ✓');
+    // Clear inputs
+    ['p-ron91','p-ron95','p-diesel','p-kerosene'].forEach(id => document.getElementById(id).value = '');
+    showToast('Price board published ✓');
     loadPrices();
   }
 
@@ -532,12 +586,20 @@
     } catch {}
   }
 
+  function currentUser() {
+    return JSON.parse(localStorage.getItem('eco_admin_session') || '{}').user || 'Employee';
+  }
+
   async function setBranch(name, status, btn) {
     const card = btn.closest('.branch-card');
     card.querySelectorAll('.btn-status').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    const bId  = name.replace(/[^a-z0-9]/gi,'_');
+    const note = document.getElementById('note-' + bId) ? document.getElementById('note-' + bId).value : '';
     try {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ type:'updateBranch', branchName:name, status }) });
+      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({
+        type: 'updateBranch', branchName: name, status, note, updatedBy: currentUser()
+      })});
     } catch {}
     showToast(`${name}: ${status}`);
   }
