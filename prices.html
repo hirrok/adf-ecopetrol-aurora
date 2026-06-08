@@ -162,4 +162,30 @@
         const d = new Date(latest.Timestamp);
         document.getElementById('lastUpdated').textContent = d.toLocaleString('en-PH', {month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
       }
-      const hist
+      // History table
+      const hist = data.slice(0, 10);
+      const tbody = document.getElementById('priceHistory');
+      if (hist.length > 0) {
+        tbody.innerHTML = hist.map(r => {
+          const d = new Date(r.Timestamp);
+          const label = d.toLocaleString('en-PH', {month:'short', day:'numeric', year:'numeric'});
+          return `<tr>
+            <td>${label}</td>
+            <td>₱${r.RON91 || '—'}</td>
+            <td>₱${r.RON95 || '—'}</td>
+            <td>₱${r.Diesel || '—'}</td>
+            <td>₱${r.Kerosene || '—'}</td>
+          </tr>`;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">No price history yet.</td></tr>';
+      }
+    } catch {
+      document.getElementById('lastUpdated').textContent = 'Unavailable';
+    }
+  }
+
+  loadPrices();
+</script>
+</body>
+</html>
