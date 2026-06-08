@@ -229,8 +229,8 @@
           <button class="refresh-btn" onclick="loadContact()">↻ Refresh</button>
         </div>
         <table>
-          <thead><tr><th>Name</th><th>Phone</th><th>Subject</th><th>Message</th><th>Branch</th><th>Date</th></tr></thead>
-          <tbody id="contactTable"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+          <thead><tr><th>Name</th><th>Phone</th><th>Subject</th><th>Message</th><th>Branch</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="contactTable"><tr><td colspan="7" class="loading">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -418,17 +418,19 @@
   function statusBadgeClass(s) {
     return {New:'badge-new','In Review':'badge-inreview',Contacted:'badge-inreview',Done:'badge-done',Declined:'badge-declined'}[s] || 'badge-new';
   }
-  function statusSelect(type, id, current) {
+  function statusSelect(type, rowId, sheetRow, current) {
     const opts = STATUS_OPTS.map(o => `<option value="${o}" ${o===current?'selected':''}>${o}</option>`).join('');
-    return `<select class="status-sel" onchange="updateStatus('${type}','${id}',this.value)">${opts}</select>`;
+    return `<select class="status-sel" onchange="updateStatus('${type}','${rowId}',${sheetRow||0},this.value)">${opts}</select>`;
   }
 
-  async function updateStatus(sheet, rowId, status) {
+  async function updateStatus(sheet, rowId, sheetRow, status) {
     try {
-      await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({
-        type: 'updateStatus', sheet, rowId, status, updatedBy: currentUser()
+      const res  = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({
+        type: 'updateStatus', sheet, rowId, _row: sheetRow, status, updatedBy: currentUser()
       })});
-    } catch {}
+      const data = await res.json();
+      if (!data.ok) { showToast('Update failed ✗'); return; }
+    } catch { showToast('Network error ✗'); return; }
     showToast(`Status → ${status}`);
   }
 
@@ -443,7 +445,7 @@
         <td>${r.ProductMix}</td>
         <td class="td-muted">${r.Branch}</td>
         <td class="td-muted">${fmtDate(r.Timestamp)}</td>
-        <td>${statusSelect('fleet', r.RowId||i, r.Status||'New')}</td>
+        <td>${statusSelect('fleet', r.RowId||'', r._row, r.Status||'New')}</td>
       </tr>
     `).join('') : '<tr><td colspan="8" class="loading">No applications yet.</td></tr>';
   }
@@ -460,7 +462,7 @@
         <td>${r.Quantity}</td>
         <td class="td-muted">${r.Branch}</td>
         <td>${r.DeliveryDate || '—'}</td>
-        <td>${statusSelect('lpg', r.RowId||i, r.Status||'New')}</td>
+        <td>${statusSelect('lpg', r.RowId||'', r._row, r.Status||'New')}</td>
       </tr>
     `).join('') : '<tr><td colspan="8" class="loading">No requests yet.</td></tr>';
   }
@@ -473,11 +475,12 @@
         <td><strong>${r.Name}</strong></td>
         <td>${r.Phone}</td>
         <td>${r.Subject || '—'}</td>
-        <td class="td-muted" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.Message}</td>
+        <td class="td-muted" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.Message}</td>
         <td class="td-muted">${r.Branch || '—'}</td>
         <td class="td-muted">${fmtDate(r.Timestamp)}</td>
+        <td>${statusSelect('contact', r.RowId||'', r._row, r.Status||'New')}</td>
       </tr>
-    `).join('') : '<tr><td colspan="6" class="loading">No messages yet.</td></tr>';
+    `).join('') : '<tr><td colspan="7" class="loading">No messages yet.</td></tr>';
   }
 
   // ── PRICES ────────────────────────────────────────────
@@ -527,8 +530,9 @@
     const code   = document.getElementById('modal-code').value.trim();
     if (!reason) { document.getElementById('modal-reason').focus(); showToast('Reason required'); return; }
     if (!code)   { document.getElementById('modal-code').focus(); showToast('Manager code required'); return; }
+    const action = pendingAction; // capture before closeModal wipes it
     closeModal();
-    if (pendingAction === 'prices') await executePriceSave(reason, code);
+    if (action === 'prices') await executePriceSave(reason, code);
   }
 
   async function executePriceSave(reason, managerCode) {
@@ -544,11 +548,11 @@
       managerCode: managerCode
     };
     try {
-      const res = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+      const res  = await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
       const data = await res.json();
       if (data.error === 'UNAUTHORIZED') { showToast('Wrong manager code ✗'); return; }
-    } catch {}
-    // Clear inputs
+      if (!data.ok) { showToast('Publish failed: ' + (data.error || 'Unknown error')); return; }
+    } catch { showToast('Network error — publish failed ✗'); return; }
     ['p-ron91','p-ron95','p-diesel','p-kerosene'].forEach(id => document.getElementById(id).value = '');
     showToast('Price board published ✓');
     loadPrices();
