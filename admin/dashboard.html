@@ -113,6 +113,36 @@
     .loading{color:var(--muted);font-size:0.85rem;padding:20px;}
     .refresh-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.75rem;}
     .refresh-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+
+    /* ── ADF OPERATOR SUITE (Marketing / AI / Intelligence) ── */
+    .accent{color:var(--yellow);}
+    .suite-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin-bottom:14px;}
+    .suite-metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+    .suite-metric{background:var(--surface2);border-radius:6px;padding:16px 20px;}
+    .suite-metric-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+    .suite-metric-value{font-size:1.5rem;font-weight:800;font-family:var(--fh);}
+    .btn-grid{display:grid;gap:10px;margin-bottom:20px;}
+    .btn-grid-2{grid-template-columns:repeat(2,1fr);}
+    .btn-grid-3{grid-template-columns:repeat(3,1fr);}
+    .action-btn{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:4px;padding:12px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;text-align:left;transition:all 0.15s;font-family:var(--ff);line-height:1.3;}
+    .action-btn:hover{background:var(--surface2);border-color:var(--yellow);}
+    .action-btn.active{background:rgba(212,168,0,0.1);color:var(--yellow);border-color:var(--yellow);}
+    .output-block{background:#070a12;border:1px solid var(--border);border-radius:6px;padding:20px 24px;}
+    .output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .output-badge{background:rgba(212,168,0,0.15);color:var(--yellow);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:3px 8px;border-radius:4px;font-family:var(--fh);}
+    .output-status{font-size:0.7rem;color:var(--muted);}
+    .output-pre{font-size:0.82rem;color:var(--text);white-space:pre-wrap;line-height:1.8;font-family:var(--ff);min-height:24px;}
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .chart-title{font-size:0.85rem;font-weight:700;margin-bottom:16px;}
+    .bar-row{margin-bottom:10px;}
+    .bar-header{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted);margin-bottom:4px;}
+    .bar-track{height:3px;background:var(--surface2);border-radius:2px;}
+    .bar-fill{height:100%;border-radius:2px;transition:width 0.7s ease;}
+    @media(max-width:768px){
+      .suite-metric-grid{grid-template-columns:repeat(2,1fr);}
+      .btn-grid-2,.btn-grid-3{grid-template-columns:1fr;}
+      .chart-grid{grid-template-columns:1fr;}
+    }
   </style>
 </head>
 <body>
@@ -158,6 +188,18 @@
       </button>
       <button class="sidebar-btn" onclick="showPage('branches')">
         <span class="sidebar-icon">📍</span> Branch Status
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Foundry Suite</div>
+      <button class="sidebar-btn" onclick="showPage('marketing')">
+        <span class="sidebar-icon">📣</span> Marketing
+      </button>
+      <button class="sidebar-btn" onclick="showPage('ai')">
+        <span class="sidebar-icon">🤖</span> AI Console
+      </button>
+      <button class="sidebar-btn" onclick="showPage('intelligence')">
+        <span class="sidebar-icon">📊</span> Intelligence
       </button>
     </div>
   </aside>
@@ -277,6 +319,60 @@
       </div>
     </div>
 
+    <!-- MARKETING GENERATOR -->
+    <div class="page" id="page-marketing">
+      <div class="page-title">Marketing Generator</div>
+      <div class="page-sub">Generate ready-to-publish content for Ecopetrol Aurora's branches and fleet/LPG accounts.</div>
+      <div class="btn-grid btn-grid-2" id="mktg-btns">
+        <button class="action-btn" onclick="generateContent('priceUpdate')">⛽ Price Update Post</button>
+        <button class="action-btn" onclick="generateContent('bulkPromo')">🚛 Bulk Buyer Promo</button>
+        <button class="action-btn" onclick="generateContent('branchAnnounce')">📍 Branch Announcement</button>
+        <button class="action-btn" onclick="generateContent('deliveryCampaign')">🔥 LPG Delivery Campaign</button>
+      </div>
+      <div id="mktg-output" style="display:none;" class="output-block">
+        <div class="output-header">
+          <span class="output-badge" id="mktg-badge">TYPE</span>
+          <span class="output-status" id="mktg-status">Generating...</span>
+        </div>
+        <pre class="output-pre" id="mktg-text"></pre>
+      </div>
+    </div>
+
+    <!-- AI CONSOLE -->
+    <div class="page" id="page-ai">
+      <div class="page-title">AI Console</div>
+      <div class="page-sub">Run AI-powered analysis across fleet, LPG and branch data. Select a query to generate actionable insights.</div>
+      <div class="btn-grid btn-grid-3" id="ai-btns">
+        <button class="action-btn" onclick="runAI('delivery')">Delivery Intelligence</button>
+        <button class="action-btn" onclick="runAI('revenue')">Revenue Intelligence</button>
+        <button class="action-btn" onclick="runAI('inquiries')">Inquiry Intelligence</button>
+      </div>
+      <div id="ai-output" style="display:none;" class="output-block">
+        <div class="output-header">
+          <span class="output-badge">AI ANALYSIS</span>
+          <span class="output-status" id="ai-status">Analyzing data...</span>
+        </div>
+        <pre class="output-pre" id="ai-text"></pre>
+      </div>
+    </div>
+
+    <!-- BUSINESS INTELLIGENCE -->
+    <div class="page" id="page-intelligence">
+      <div class="page-title">Business Intelligence</div>
+      <div class="page-sub">Live snapshot of revenue, deliveries and inquiry pipeline across all branches.</div>
+      <div class="suite-metric-grid" id="kpi-grid"></div>
+      <div class="chart-grid">
+        <div class="suite-card">
+          <div class="chart-title" id="chart-left-title">Revenue by Branch</div>
+          <div id="chart-left"></div>
+        </div>
+        <div class="suite-card">
+          <div class="chart-title" id="chart-right-title">Product Mix</div>
+          <div id="chart-right"></div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -339,6 +435,228 @@
     if (id === 'contact') loadContact();
     if (id === 'prices') loadPrices();
     if (id === 'branches') loadBranches();
+    if (id === 'intelligence') { renderKPI(); renderChart('chart-left','chart-left-title',CHART_LEFT,'value'); renderChart('chart-right','chart-right-title',CHART_RIGHT,'pct'); }
+  }
+
+  // ── ADF OPERATOR SUITE ─────────────────────────────────
+  const SUITE_BRAND    = 'Ecopetrol Aurora';
+  const SUITE_LOCATION = 'Maria Aurora & Baler, Aurora Province';
+
+  const KPI_DATA = [
+    ['Revenue MTD',        '₱40,000', 'var(--green)'],
+    ['Target',             '₱100,000', 'var(--muted)'],
+    ['Progress',           '40%',      'var(--yellow)'],
+    ['Open Inquiries',     '0',        'var(--text)'],
+    ['Branches Open',      '8 / 8',    'var(--green)'],
+    ['MRR (Maintenance)',  '₱3,000',   'var(--green)'],
+  ];
+
+  const CHART_LEFT = {
+    title: 'Revenue by Branch (illustrative — wire to REVENUE tab)',
+    data: [
+      { label: 'Maria Aurora — Flagship', value: 18000, color: 'var(--yellow)' },
+      { label: 'Baler NE',                value: 9000,  color: 'var(--blue)'   },
+      { label: 'Baler Pingit',            value: 6000,  color: 'var(--green)'  },
+      { label: 'Dipaculao South',         value: 4000,  color: 'var(--muted)'  },
+      { label: 'San Luis',                value: 3000,  color: 'var(--muted)'  },
+    ]
+  };
+
+  const CHART_RIGHT = {
+    title: 'Product Mix (illustrative)',
+    data: [
+      { label: 'Diesel Euro 4',   pct: 45, color: 'var(--yellow)' },
+      { label: 'Unleaded RON 91', pct: 30, color: 'var(--blue)'   },
+      { label: 'Premium RON 95',  pct: 12, color: 'var(--green)'  },
+      { label: 'LPG',              pct: 10, color: '#93b4ff'      },
+      { label: 'Kerosene',         pct: 3,  color: 'var(--muted)' },
+    ]
+  };
+
+  const MARKETING_OUTPUTS = {
+    priceUpdate:
+`FACEBOOK POST — ${SUITE_BRAND} Price Update
+
+⛽ TODAY'S PUMP PRICES — All Branches
+
+Diesel Euro 4: ₱[diesel]
+Unleaded RON 91: ₱[ron91]
+Premium RON 95: ₱[ron95]
+Kerosene: ₱[kerosene]
+
+Updated this morning across all 8 branches in ${SUITE_LOCATION}.
+Fleet accounts: ask about volume rates.
+
+#EcopetrolAurora #AuroraProvince #FuelPrices #Baler`,
+
+    bulkPromo:
+`FACEBOOK / SMS — Fleet & Bulk Buyer Promo
+
+🚛 RUN A FLEET? PARTNER WITH ${SUITE_BRAND}.
+
+· Volume diesel rates for 5+ vehicles
+· Priority fueling at any of our 8 branches
+· Monthly billing, no per-trip hassle
+
+Open a fleet account today — message us or visit
+your nearest branch in ${SUITE_LOCATION}.
+
+#FleetAccounts #EcopetrolAurora #AuroraProvince`,
+
+    branchAnnounce:
+`BRANCH ANNOUNCEMENT TEMPLATE
+
+📍 [Branch Name] — [Open / Limited / Closed]
+
+[SWAP] Reason for status (maintenance, restock, weather, etc.)
+Expected resolution: [date/time]
+
+Nearest alternate branch: [Branch Name], [distance/travel time]
+
+We'll update this post the moment things change.
+Thank you for your patience — ${SUITE_BRAND}.`,
+
+    deliveryCampaign:
+`SMS / WHATSAPP — LPG Delivery Campaign
+
+🔥 LPG REFILL? WE DELIVER.
+
+Hi [Name]! ${SUITE_BRAND} LPG delivery is available in your area
+(${SUITE_LOCATION}). 11kg & 22kg cylinders, same-day or next-day.
+
+Reply REFILL with your address and cylinder size to book.
+
+Batch targeting: customers with last delivery 25+ days ago
+(refill cycle reminder).`,
+  };
+
+  const AI_OUTPUTS = {
+    delivery:
+`DELIVERY INTELLIGENCE — Current Cycle
+
+LPG REQUESTS IN QUEUE: [N] (live from LPG tab)
+
+[SWAP — once volume builds] GROUP BY BRANCH for routing:
+· [Branch]: [N] requests — suggested route order by barangay
+· [Branch]: [N] requests
+
+REPEAT-CUSTOMER REFILL WINDOW:
+· Customers due for refill (25+ days since last delivery): [N]
+· Recommended: pre-emptive SMS via Marketing Generator → "LPG Delivery Campaign"
+
+RECOMMENDED ACTIONS:
+1. Batch same-day deliveries by branch + barangay proximity
+2. Flag any request >48hrs unfulfilled for manager follow-up
+3. Track delivery completion in LPG tab status field
+
+PROJECTED IMPACT:
+Reducing avg. delivery turnaround by 1 day historically lifts
+repeat-order rate ~8-12% for LPG distributors.`,
+
+    revenue:
+`REVENUE INTELLIGENCE — Current Month
+
+MTD REVENUE: ₱40,000 (setup fee, recognized)
+RECURRING (MRR): ₱3,000 (maintenance contract)
+TARGET: ₱100,000 MTD (illustrative — set real target with Hirro)
+GAP: ₱60,000
+
+TO CLOSE THE GAP:
+· Fleet accounts: each new fleet account (5+ vehicles, diesel)
+  adds est. ₱8,000-15,000/month in volume revenue
+· LPG repeat cycle: every 20 active residential accounts on a
+  25-day refill cycle ≈ ₱[X]/month recurring
+
+CURRENT PIPELINE:
+· Fleet Applications: [N] in Fleet tab — check for "New" status
+· LPG Requests: [N] in LPG tab
+
+RECOMMENDATION:
+[SWAP] Once Fleet/LPG tabs carry real volume, prioritize converting
+"New" fleet applications within 48hrs — fastest lever to close gap.`,
+
+    inquiries:
+`INQUIRY INTELLIGENCE — Messages & Contact Pipeline
+
+TOTAL OPEN MESSAGES: [N] (live from Contact tab)
+
+HIGH PRIORITY — Same-day response:
+1. [Name] — Subject: [Subject]
+   Branch: [Branch] · Received: [date]
+   Action: [response template via Marketing Generator or direct call]
+
+NEW LEADS — Untouched ("New" status):
+· [Name] ([Branch]) — assign to branch manager
+· [Name] ([Branch]) — assign to branch manager
+
+[SWAP] Replace placeholders once Contact tab has live volume.
+Until then: monitor "New" badge counts on Overview for same-day
+response — Foundry doctrine standard is <24hr first response.`,
+  };
+
+  function typeWriter(targetId, text, speed, onDone) {
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    el.textContent = '';
+    let i = 0;
+    const t = setInterval(() => {
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length) { clearInterval(t); if (onDone) onDone(); }
+    }, speed);
+  }
+
+  function generateContent(type) {
+    document.querySelectorAll('#mktg-btns .action-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.querySelector('#mktg-btns .action-btn[onclick="generateContent(\'' + type + '\')"]');
+    if (activeBtn) activeBtn.classList.add('active');
+    const output = document.getElementById('mktg-output');
+    output.style.display = 'block';
+    document.getElementById('mktg-badge').textContent = type.toUpperCase();
+    document.getElementById('mktg-status').textContent = 'Generating...';
+    document.getElementById('mktg-text').textContent = '';
+    typeWriter('mktg-text', MARKETING_OUTPUTS[type] || '[Output not defined for this type]', 5, () => {
+      document.getElementById('mktg-status').textContent = 'Done';
+    });
+  }
+
+  function runAI(type) {
+    document.querySelectorAll('#ai-btns .action-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.querySelector('#ai-btns .action-btn[onclick="runAI(\'' + type + '\')"]');
+    if (activeBtn) activeBtn.classList.add('active');
+    const output = document.getElementById('ai-output');
+    output.style.display = 'block';
+    document.getElementById('ai-status').textContent = 'Analyzing data...';
+    document.getElementById('ai-text').textContent = '';
+    setTimeout(() => {
+      typeWriter('ai-text', AI_OUTPUTS[type] || '[Output not defined for this type]', 7, () => {
+        document.getElementById('ai-status').textContent = 'Analysis complete';
+      });
+    }, 500);
+  }
+
+  function renderKPI() {
+    const grid = document.getElementById('kpi-grid');
+    if (!grid) return;
+    grid.innerHTML = KPI_DATA.map(([label, value, color]) => '<div class="suite-metric"><div class="suite-metric-label">' + label + '</div><div class="suite-metric-value" style="color:' + color + '">' + value + '</div></div>').join('');
+  }
+
+  function renderChart(containerId, titleId, def, mode) {
+    const titleEl = document.getElementById(titleId);
+    const container = document.getElementById(containerId);
+    if (!titleEl || !container) return;
+    titleEl.textContent = def.title;
+    const maxVal = mode === 'value' ? Math.max(...def.data.map(d => d.value)) : 100;
+    container.innerHTML = def.data.map(row => {
+      const pct  = mode === 'value' ? Math.round((row.value / maxVal) * 100) : row.pct;
+      const disp = mode === 'value' ? ('₱' + row.value.toLocaleString()) : (row.pct + '%');
+      return '<div class="bar-row"><div class="bar-header"><span>' + row.label + '</span><span>' + disp + '</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:' + row.color + '" data-width="' + pct + '"></div></div></div>';
+    }).join('');
+    requestAnimationFrame(() => {
+      container.querySelectorAll('.bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+      });
+    });
   }
 
   // ── DATE ─────────────────────────────────────────────
