@@ -182,16 +182,16 @@
       <div class="price-ticker" id="priceTicker">
         <div class="ticker-item">
           <div class="ticker-label">Unleaded</div>
-          <div class="ticker-price" id="t-ron91">₱89.50 <span>/L</span></div>
+          <div class="ticker-price" id="t-ron91">$1.44 <span>/L</span></div>
           <div class="ticker-date" id="ticker-date">As of today</div>
         </div>
         <div class="ticker-item">
           <div class="ticker-label">Premium</div>
-          <div class="ticker-price" id="t-ron95">₱94.00 <span>/L</span></div>
+          <div class="ticker-price" id="t-ron95">$1.51 <span>/L</span></div>
         </div>
         <div class="ticker-item">
           <div class="ticker-label">Diesel</div>
-          <div class="ticker-price" id="t-diesel">₱84.50 <span>/L</span></div>
+          <div class="ticker-price" id="t-diesel">$1.36 <span>/L</span></div>
         </div>
         <div class="ticker-item" style="border-left:1px solid var(--border);padding-left:40px;">
           <div class="ticker-label">Full Price Board</div>
@@ -362,7 +362,8 @@
 </footer>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
+  const PHP_TO_USD = 0.0160393;
+const usd = value => ' 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
   // Load live prices from Google Sheets (falls back to placeholders)
   const SHEET_ID = '1YSl6At1Gbcg64yTtJmL134YkWnNf26rFxm_Q88EX4GM';
   const PRICES_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
@@ -373,9 +374,49 @@
       const json = await res.json();
       const latest = json.data && json.data[0];
       if (latest) {
-        document.getElementById('t-ron91').innerHTML = `₱${latest.RON91} <span>/L</span>`;
-        document.getElementById('t-ron95').innerHTML = `₱${latest.RON95} <span>/L</span>`;
-        document.getElementById('t-diesel').innerHTML = `₱${latest.Diesel} <span>/L</span>`;
+        document.getElementById('t-ron91').innerHTML = `${usd(latest.RON91)} <span>/L</span>`;
+        document.getElementById('t-ron95').innerHTML = `${usd(latest.RON95)} <span>/L</span>`;
+        document.getElementById('t-diesel').innerHTML = `${usd(latest.Diesel)} <span>/L</span>`;
+        const d = new Date(latest.Timestamp);
+        document.getElementById('ticker-date').textContent = `Updated ${d.toLocaleDateString('en-PH', {month:'short',day:'numeric'})}`;
+      }
+    } catch {}
+  }
+
+  // Branch cards
+  const BRANCHES = [
+    { name: 'Maria Aurora — Flagship', loc: 'Maria Aurora, Aurora', products: ['Unleaded','Diesel','Solane LPG'] },
+    { name: 'Baler NE', loc: 'Baler, Aurora', products: ['Unleaded','Diesel','Solane LPG'] },
+    { name: 'Baler Pingit', loc: 'Baler, Aurora', products: ['Unleaded','Diesel'] },
+    { name: 'Dipaculao South', loc: 'Dipaculao, Aurora', products: ['Unleaded','Diesel','Solane LPG'] },
+    { name: 'San Luis', loc: 'San Luis, Aurora', products: ['Unleaded','Diesel','Solane LPG'] },
+    { name: 'Dinadiawan', loc: 'Dinadiawan, Aurora', products: ['Unleaded','Diesel'] },
+    { name: 'Detailen', loc: 'Maria Aurora, Aurora', products: ['Unleaded','Diesel'] },
+    { name: 'Uno', loc: 'Maria Aurora, Aurora', products: ['Unleaded','Diesel','Solane LPG'] },
+  ];
+
+  document.getElementById('branchCards').innerHTML = BRANCHES.slice(0, 8).map(b => `
+    <div class="branch-card">
+      <div class="branch-status-text"><span class="branch-status-dot"></span> Open</div>
+      <div class="branch-name">${b.name}</div>
+      <div class="branch-loc">${b.loc}</div>
+      <div class="branch-products">${b.products.map(p => `<span class="prod-tag">${p}</span>`).join('')}</div>
+    </div>
+  + (Number(value || 0) * PHP_TO_USD).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
+  // Load live prices from Google Sheets (falls back to placeholders)
+  const SHEET_ID = '1YSl6At1Gbcg64yTtJmL134YkWnNf26rFxm_Q88EX4GM';
+  const PRICES_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+
+  async function loadPrices() {
+    try {
+      const res = await fetch(`${SCRIPT_URL}?type=prices`);
+      const json = await res.json();
+      const latest = json.data && json.data[0];
+      if (latest) {
+        document.getElementById('t-ron91').innerHTML = `${usd(latest.RON91)} <span>/L</span>`;
+        document.getElementById('t-ron95').innerHTML = `${usd(latest.RON95)} <span>/L</span>`;
+        document.getElementById('t-diesel').innerHTML = `${usd(latest.Diesel)} <span>/L</span>`;
         const d = new Date(latest.Timestamp);
         document.getElementById('ticker-date').textContent = `Updated ${d.toLocaleDateString('en-PH', {month:'short',day:'numeric'})}`;
       }
