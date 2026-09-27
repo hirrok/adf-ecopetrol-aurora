@@ -100,28 +100,28 @@
     <div class="price-card fuel-unleaded">
       <div class="fuel-badge badge-green">Unleaded</div>
       <div class="price-product">Gasoline RON 91</div>
-      <div class="price-value" id="p-ron91">₱89.50</div>
+      <div class="price-value" id="p-ron91">$1.44</div>
       <div class="price-unit">per liter</div>
       <div class="price-desc">Standard unleaded gasoline for passenger vehicles, motorcycles, and light trucks.</div>
     </div>
     <div class="price-card fuel-premium">
       <div class="fuel-badge badge-red">Premium</div>
       <div class="price-product">Gasoline RON 95</div>
-      <div class="price-value" id="p-ron95">₱94.00</div>
+      <div class="price-value" id="p-ron95">$1.51</div>
       <div class="price-unit">per liter</div>
       <div class="price-desc">Higher octane premium fuel for modern engines requiring higher compression ratios.</div>
     </div>
     <div class="price-card fuel-diesel">
       <div class="fuel-badge badge-yellow">Diesel</div>
       <div class="price-product">Euro 4 Compliant</div>
-      <div class="price-value" id="p-diesel">₱84.50</div>
+      <div class="price-value" id="p-diesel">$1.36</div>
       <div class="price-unit">per liter</div>
       <div class="price-desc">Euro 4 compliant diesel for trucks, heavy equipment, buses, and commercial vehicles.</div>
     </div>
     <div class="price-card fuel-kerosene">
       <div class="fuel-badge badge-slate">Kerosene</div>
       <div class="price-product">Household & Commercial</div>
-      <div class="price-value" id="p-kerosene">₱118.50</div>
+      <div class="price-value" id="p-kerosene">$1.90</div>
       <div class="price-unit">per liter</div>
       <div class="price-desc">Household and commercial kerosene. Available at selected branches.</div>
     </div>
@@ -147,7 +147,8 @@
 </div></div></footer>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
+  const PHP_TO_USD = 0.0160393;
+const usd = value => value === undefined || value === null || value === '' ? '—' : ' 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
   async function loadPrices() {
     try {
       const res = await fetch(`${SCRIPT_URL}?type=prices`);
@@ -155,10 +156,10 @@
       const data = json.data || [];
       if (data.length > 0) {
         const latest = data[0];
-        document.getElementById('p-ron91').textContent = `₱${latest.RON91}`;
-        document.getElementById('p-ron95').textContent = `₱${latest.RON95}`;
-        document.getElementById('p-diesel').textContent = `₱${latest.Diesel}`;
-        document.getElementById('p-kerosene').textContent = `₱${latest.Kerosene}`;
+        document.getElementById('p-ron91').textContent = usd(latest.RON91);
+        document.getElementById('p-ron95').textContent = usd(latest.RON95);
+        document.getElementById('p-diesel').textContent = usd(latest.Diesel);
+        document.getElementById('p-kerosene').textContent = usd(latest.Kerosene);
         const d = new Date(latest.Timestamp);
         document.getElementById('lastUpdated').textContent = d.toLocaleString('en-PH', {month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
       }
@@ -171,10 +172,52 @@
           const label = d.toLocaleString('en-PH', {month:'short', day:'numeric', year:'numeric'});
           return `<tr>
             <td>${label}</td>
-            <td>₱${r.RON91 || '—'}</td>
-            <td>₱${r.RON95 || '—'}</td>
-            <td>₱${r.Diesel || '—'}</td>
-            <td>₱${r.Kerosene || '—'}</td>
+            <td>${usd(r.RON91)}</td>
+            <td>${usd(r.RON95)}</td>
+            <td>${usd(r.Diesel)}</td>
+            <td>${usd(r.Kerosene)}</td>
+          </tr>`;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">No price history yet.</td></tr>';
+      }
+    } catch {
+      document.getElementById('lastUpdated').textContent = 'Unavailable';
+    }
+  }
+
+  loadPrices();
+</script>
+</body>
+</html> + (Number(value) * PHP_TO_USD).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnL82TNk1DplBIDCbgxwH1rfWhtBqZqMK1A87BETMYaUQYMKMrHgBfBUpEogBclKuf9w/exec';
+  async function loadPrices() {
+    try {
+      const res = await fetch(`${SCRIPT_URL}?type=prices`);
+      const json = await res.json();
+      const data = json.data || [];
+      if (data.length > 0) {
+        const latest = data[0];
+        document.getElementById('p-ron91').textContent = usd(latest.RON91);
+        document.getElementById('p-ron95').textContent = usd(latest.RON95);
+        document.getElementById('p-diesel').textContent = usd(latest.Diesel);
+        document.getElementById('p-kerosene').textContent = usd(latest.Kerosene);
+        const d = new Date(latest.Timestamp);
+        document.getElementById('lastUpdated').textContent = d.toLocaleString('en-PH', {month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      }
+      // History table
+      const hist = data.slice(0, 10);
+      const tbody = document.getElementById('priceHistory');
+      if (hist.length > 0) {
+        tbody.innerHTML = hist.map(r => {
+          const d = new Date(r.Timestamp);
+          const label = d.toLocaleString('en-PH', {month:'short', day:'numeric', year:'numeric'});
+          return `<tr>
+            <td>${label}</td>
+            <td>${usd(r.RON91)}</td>
+            <td>${usd(r.RON95)}</td>
+            <td>${usd(r.Diesel)}</td>
+            <td>${usd(r.Kerosene)}</td>
           </tr>`;
         }).join('');
       } else {
